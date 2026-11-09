@@ -1,0 +1,85 @@
+<div class="passos d-flex flex-wrap gap-3 gap-md-4 mb-4 d-print-none">
+  <div class="passo"><span class="num">1</span> Escolha o passeio</div>
+  <div class="passo"><span class="num">2</span> Data e participantes</div>
+  <div class="passo ativo"><span class="num">3</span> Reserva e comprovante</div>
+</div>
+
+@if (carregando()) {
+  <div class="text-center py-5"><div class="spinner-border text-tur" role="status"></div></div>
+} @else if (!reserva()) {
+  <div class="alert alert-danger">{{ erro() }}</div>
+  <a routerLink="/consulta" class="btn btn-outline-secondary">Consultar outro código</a>
+} @else {
+  @let r = reserva()!;
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
+      @if (r.status === 'CONFIRMADA') {
+        <div class="text-center mb-4 d-print-none">
+          <i class="bi bi-check-circle-fill text-success display-4"></i>
+          <h2 class="fw-bold mt-2">Reserva confirmada!</h2>
+          <p class="text-muted">Guarde o código abaixo para consultar sua reserva.</p>
+        </div>
+      } @else {
+        <div class="alert alert-danger text-center"><i class="bi bi-x-circle me-1"></i> Esta reserva foi <strong>cancelada</strong>.</div>
+      }
+
+      <div class="comprovante p-4 p-md-5 shadow-sm">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-2">
+          <div>
+            <div class="text-muted small text-uppercase">Comprovante de reserva</div>
+            <div class="codigo-comprovante fw-bold">{{ r.codigoComprovante }}</div>
+          </div>
+          <span class="badge fs-6" [class.text-bg-success]="r.status === 'CONFIRMADA'" [class.text-bg-danger]="r.status === 'CANCELADA'">
+            {{ r.status }}
+          </span>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-sm-6">
+            <h6 class="text-tur text-uppercase small fw-bold">Passeio</h6>
+            <div class="fw-semibold">{{ r.passeio.nome }}</div>
+            <div class="text-muted small">{{ r.passeio.destino }} &middot; {{ r.passeio.duracaoHoras }}h</div>
+          </div>
+          <div class="col-sm-6">
+            <h6 class="text-tur text-uppercase small fw-bold">Data</h6>
+            <div class="fw-semibold">{{ r.dataPasseio + 'T00:00:00' | date: 'EEEE, dd/MM/yyyy' }}</div>
+          </div>
+          <div class="col-sm-6">
+            <h6 class="text-tur text-uppercase small fw-bold">Cliente</h6>
+            <div class="fw-semibold">{{ r.cliente.nome }}</div>
+            <div class="text-muted small">CPF {{ r.cliente.cpf | formatar: 'cpf' }}</div>
+            <div class="text-muted small">{{ r.cliente.email }} &middot; {{ r.cliente.telefone | formatar: 'telefone' }}</div>
+          </div>
+          <div class="col-sm-6">
+            <h6 class="text-tur text-uppercase small fw-bold">Participantes</h6>
+            <div class="fw-semibold">{{ r.quantidadeParticipantes }} pessoa(s)</div>
+            <div class="text-muted small">{{ r.passeio.preco | currency: 'BRL' }} por pessoa</div>
+          </div>
+          @if (r.observacoes) {
+            <div class="col-12">
+              <h6 class="text-tur text-uppercase small fw-bold">Observações</h6>
+              <div>{{ r.observacoes }}</div>
+            </div>
+          }
+        </div>
+
+        <hr class="my-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted">Valor total</span>
+          <span class="preco fs-3">{{ r.valorTotal | currency: 'BRL' }}</span>
+        </div>
+        <div class="text-muted small mt-2">Reserva feita em {{ r.dataCriacao | date: 'dd/MM/yyyy HH:mm' }}</div>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2 justify-content-center mt-4 d-print-none">
+        <button class="btn btn-tur" (click)="imprimir()"><i class="bi bi-printer me-1"></i> Imprimir comprovante</button>
+        @if (r.status === 'CONFIRMADA') {
+          <button class="btn btn-outline-danger" (click)="cancelar()" [disabled]="cancelando()">
+            <i class="bi bi-x-circle me-1"></i> Cancelar reserva
+          </button>
+        }
+        <a routerLink="/" class="btn btn-outline-secondary"><i class="bi bi-grid me-1"></i> Ver outros passeios</a>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,86 @@
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h3 class="mb-0"><i class="bi bi-people text-tur"></i> Clientes</h3>
+  <a routerLink="/admin/clientes/novo" class="btn btn-tur"><i class="bi bi-plus-lg"></i> Novo cliente</a>
+</div>
+
+@if (mensagem(); as m) {
+  <div class="alert alert-{{ m.tipo }} alert-dismissible">
+    {{ m.texto }}
+    <button type="button" class="btn-close" (click)="mensagem.set(null)" aria-label="Fechar"></button>
+  </div>
+}
+
+<input type="search" class="form-control mb-3" placeholder="Buscar por nome, e-mail ou CPF..."
+       [ngModel]="busca()" (ngModelChange)="busca.set($event)" aria-label="Buscar cliente">
+
+@if (carregando()) {
+  <div class="text-center py-5"><div class="spinner-border text-tur"></div></div>
+} @else {
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Nome</th>
+            <th class="d-none d-sm-table-cell">CPF</th>
+            <th class="d-none d-lg-table-cell">E-mail</th>
+            <th class="d-none d-md-table-cell">Telefone</th>
+            <th class="text-end">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of filtrados(); track c.id) {
+            <tr [class.table-info]="selecionado()?.id === c.id">
+              <td>
+                <div class="fw-semibold">{{ c.nome }}</div>
+                <div class="small text-muted d-sm-none">{{ c.cpf | formatar: 'cpf' }}</div>
+              </td>
+              <td class="d-none d-sm-table-cell text-nowrap">{{ c.cpf | formatar: 'cpf' }}</td>
+              <td class="d-none d-lg-table-cell">{{ c.email }}</td>
+              <td class="d-none d-md-table-cell text-nowrap">{{ c.telefone | formatar: 'telefone' }}</td>
+              <td class="text-end text-nowrap">
+                <button class="btn btn-sm btn-outline-secondary me-1" (click)="verReservas(c)" title="Reservas do cliente">
+                  <i class="bi bi-calendar-check"></i>
+                </button>
+                <a [routerLink]="['/admin/clientes', c.id, 'editar']" class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <button class="btn btn-sm btn-outline-danger" (click)="excluir(c)" title="Excluir">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="text-center text-muted py-4">Nenhum cliente encontrado.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  @if (selecionado(); as s) {
+    <div class="card border-0 shadow-sm mt-3">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <strong>Reservas de {{ s.nome }}</strong>
+        <button type="button" class="btn-close" (click)="selecionado.set(null)" aria-label="Fechar"></button>
+      </div>
+      <ul class="list-group list-group-flush">
+        @for (r of historico(); track r.id) {
+          <li class="list-group-item d-flex flex-wrap justify-content-between gap-2">
+            <div>
+              <a [routerLink]="['/comprovante', r.codigoComprovante]" class="fw-semibold">{{ r.codigoComprovante }}</a>
+              &middot; {{ r.passeio.nome }}
+              <div class="small text-muted">{{ r.dataPasseio + 'T00:00:00' | date: 'dd/MM/yyyy' }} &middot; {{ r.quantidadeParticipantes }} pessoa(s)</div>
+            </div>
+            <div class="text-end">
+              <div>{{ r.valorTotal | currency: 'BRL' }}</div>
+              <span class="badge" [class.text-bg-success]="r.status === 'CONFIRMADA'" [class.text-bg-danger]="r.status === 'CANCELADA'">{{ r.status }}</span>
+            </div>
+          </li>
+        } @empty {
+          <li class="list-group-item text-muted">Nenhuma reserva para este cliente.</li>
+        }
+      </ul>
+    </div>
+  }
+}

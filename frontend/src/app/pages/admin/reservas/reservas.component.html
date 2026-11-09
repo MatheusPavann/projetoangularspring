@@ -1,0 +1,92 @@
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h3 class="mb-0"><i class="bi bi-calendar-check text-tur"></i> Reservas</h3>
+  <a routerLink="/admin/reservas/nova" class="btn btn-tur"><i class="bi bi-plus-lg"></i> Nova reserva</a>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm"><div class="card-body py-2">
+      <div class="small text-muted">Total de reservas</div><div class="fs-4 fw-bold">{{ reservas().length }}</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm"><div class="card-body py-2">
+      <div class="small text-muted">Confirmadas</div><div class="fs-4 fw-bold text-success">{{ confirmadas() }}</div>
+    </div></div>
+  </div>
+  <div class="col-12 col-md-6">
+    <div class="card border-0 shadow-sm"><div class="card-body py-2">
+      <div class="small text-muted">Faturamento (confirmadas)</div><div class="fs-4 fw-bold preco">{{ faturamento() | currency: 'BRL' }}</div>
+    </div></div>
+  </div>
+</div>
+
+@if (mensagem(); as m) {
+  <div class="alert alert-{{ m.tipo }} alert-dismissible">
+    {{ m.texto }}
+    <button type="button" class="btn-close" (click)="mensagem.set(null)" aria-label="Fechar"></button>
+  </div>
+}
+
+<div class="row g-2 mb-3">
+  <div class="col-12 col-md-8">
+    <input type="search" class="form-control" placeholder="Buscar por código, cliente ou passeio..."
+           [ngModel]="busca()" (ngModelChange)="busca.set($event)" aria-label="Buscar reserva">
+  </div>
+  <div class="col-12 col-md-4">
+    <select class="form-select" [ngModel]="status()" (ngModelChange)="status.set($event)" aria-label="Filtrar status">
+      <option value="">Todos os status</option>
+      <option value="CONFIRMADA">Confirmadas</option>
+      <option value="CANCELADA">Canceladas</option>
+    </select>
+  </div>
+</div>
+
+@if (carregando()) {
+  <div class="text-center py-5"><div class="spinner-border text-tur"></div></div>
+} @else {
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Código</th>
+            <th>Cliente / Passeio</th>
+            <th class="d-none d-md-table-cell">Data</th>
+            <th class="text-center d-none d-sm-table-cell">Pessoas</th>
+            <th class="text-end d-none d-lg-table-cell">Valor</th>
+            <th class="text-center">Status</th>
+            <th class="text-end">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of filtradas(); track r.id) {
+            <tr>
+              <td class="text-nowrap"><a [routerLink]="['/comprovante', r.codigoComprovante]" class="font-monospace">{{ r.codigoComprovante }}</a></td>
+              <td>
+                <div class="fw-semibold">{{ r.cliente.nome }}</div>
+                <div class="small text-muted">{{ r.passeio.nome }}</div>
+                <div class="small text-muted d-md-none">{{ r.dataPasseio + 'T00:00:00' | date: 'dd/MM/yyyy' }}</div>
+              </td>
+              <td class="d-none d-md-table-cell text-nowrap">{{ r.dataPasseio + 'T00:00:00' | date: 'dd/MM/yyyy' }}</td>
+              <td class="text-center d-none d-sm-table-cell">{{ r.quantidadeParticipantes }}</td>
+              <td class="text-end d-none d-lg-table-cell text-nowrap">{{ r.valorTotal | currency: 'BRL' }}</td>
+              <td class="text-center">
+                <span class="badge" [class.text-bg-success]="r.status === 'CONFIRMADA'" [class.text-bg-danger]="r.status === 'CANCELADA'">{{ r.status }}</span>
+              </td>
+              <td class="text-end text-nowrap">
+                @if (r.status === 'CONFIRMADA') {
+                  <a [routerLink]="['/admin/reservas', r.id, 'editar']" class="btn btn-sm btn-outline-primary me-1" title="Editar"><i class="bi bi-pencil"></i></a>
+                  <button class="btn btn-sm btn-outline-warning me-1" (click)="cancelar(r)" title="Cancelar"><i class="bi bi-x-circle"></i></button>
+                }
+                <button class="btn btn-sm btn-outline-danger" (click)="excluir(r)" title="Excluir"><i class="bi bi-trash"></i></button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="7" class="text-center text-muted py-4">Nenhuma reserva encontrada.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

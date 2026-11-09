@@ -1,0 +1,60 @@
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h3 class="mb-0"><i class="bi bi-map text-tur"></i> Passeios</h3>
+  <a routerLink="/admin/passeios/novo" class="btn btn-tur"><i class="bi bi-plus-lg"></i> Novo passeio</a>
+</div>
+
+@if (mensagem(); as m) {
+  <div class="alert alert-{{ m.tipo }} alert-dismissible">
+    {{ m.texto }}
+    <button type="button" class="btn-close" (click)="mensagem.set(null)" aria-label="Fechar"></button>
+  </div>
+}
+
+@if (carregando()) {
+  <div class="text-center py-5"><div class="spinner-border text-tur"></div></div>
+} @else {
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Nome</th>
+            <th class="d-none d-md-table-cell">Destino</th>
+            <th class="text-end">Preço</th>
+            <th class="text-center d-none d-sm-table-cell">Capacidade</th>
+            <th class="text-center">Status</th>
+            <th class="text-end">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of passeios(); track p.id) {
+            <tr>
+              <td>
+                <div class="fw-semibold">{{ p.nome }}</div>
+                <div class="small text-muted d-md-none">{{ p.destino }}</div>
+              </td>
+              <td class="d-none d-md-table-cell">{{ p.destino }}</td>
+              <td class="text-end text-nowrap">{{ p.preco | currency: 'BRL' }}</td>
+              <td class="text-center d-none d-sm-table-cell">{{ p.capacidade }}</td>
+              <td class="text-center">
+                <span class="badge" [class.text-bg-success]="p.ativo" [class.text-bg-secondary]="!p.ativo">
+                  {{ p.ativo ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+              <td class="text-end text-nowrap">
+                <a [routerLink]="['/admin/passeios', p.id, 'editar']" class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <button class="btn btn-sm btn-outline-danger" (click)="excluir(p)" title="Excluir">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="text-center text-muted py-4">Nenhum passeio cadastrado.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

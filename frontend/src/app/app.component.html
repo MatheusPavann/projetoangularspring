@@ -1,0 +1,45 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary-tur shadow-sm sticky-top d-print-none">
+  <div class="container">
+    <a class="navbar-brand fw-bold" routerLink="/">
+      <i class="bi bi-compass me-1"></i> TurisReserva
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
+            aria-controls="menu" aria-expanded="false" aria-label="Abrir menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="menu">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="bi bi-grid"></i> Passeios
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/consulta" routerLinkActive="active">
+            <i class="bi bi-receipt"></i> Minha reserva
+          </a>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-gear"></i> Gerenciar
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" routerLink="/admin/passeios"><i class="bi bi-map me-2"></i>Passeios</a></li>
+            <li><a class="dropdown-item" routerLink="/admin/clientes"><i class="bi bi-people me-2"></i>Clientes</a></li>
+            <li><a class="dropdown-item" routerLink="/admin/reservas"><i class="bi bi-calendar-check me-2"></i>Reservas</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="container py-4">
+  <router-outlet />
+</main>
+
+<footer class="text-center text-muted small py-4 d-print-none">
+  TurisReserva &middot; Trabalho Bimestral &middot; Angular + Spring Boot + PostgreSQL
+</footer>

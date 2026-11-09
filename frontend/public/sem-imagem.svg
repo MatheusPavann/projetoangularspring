@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+  <rect width="800" height="400" fill="#0b7285"/>
+  <path d="M0 320 L180 170 L300 270 L450 120 L640 300 L800 200 L800 400 L0 400 Z" fill="#1098ad"/>
+  <circle cx="640" cy="100" r="40" fill="#f59f00"/>
+  <text x="400" y="370" font-family="Arial, sans-serif" font-size="28" fill="#fff" text-anchor="middle">Passeio</text>
+</svg>

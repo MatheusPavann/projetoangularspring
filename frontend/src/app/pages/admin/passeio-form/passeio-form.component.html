@@ -1,0 +1,58 @@
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <h3 class="mb-3"><i class="bi bi-map text-tur"></i> {{ id ? 'Editar' : 'Novo' }} passeio</h3>
+    @if (erro()) { <div class="alert alert-danger">{{ erro() }}</div> }
+
+    <form [formGroup]="form" (ngSubmit)="salvar()" class="card border-0 shadow-sm p-4" novalidate>
+      <div class="row g-3">
+        <div class="col-md-7">
+          <label for="nome" class="form-label">Nome *</label>
+          <input id="nome" class="form-control" formControlName="nome" [class.is-invalid]="invalido('nome')">
+          <app-campo-erro [control]="form.controls.nome" rotulo="O nome" />
+        </div>
+        <div class="col-md-5">
+          <label for="destino" class="form-label">Destino *</label>
+          <input id="destino" class="form-control" formControlName="destino" placeholder="Cidade - UF" [class.is-invalid]="invalido('destino')">
+          <app-campo-erro [control]="form.controls.destino" rotulo="O destino" />
+        </div>
+        <div class="col-12">
+          <label for="descricao" class="form-label">Descrição *</label>
+          <textarea id="descricao" rows="3" class="form-control" formControlName="descricao" [class.is-invalid]="invalido('descricao')"></textarea>
+          <app-campo-erro [control]="form.controls.descricao" rotulo="A descrição" />
+        </div>
+        <div class="col-sm-4">
+          <label for="duracao" class="form-label">Duração (horas) *</label>
+          <input id="duracao" type="number" class="form-control" formControlName="duracaoHoras" [class.is-invalid]="invalido('duracaoHoras')">
+          <app-campo-erro [control]="form.controls.duracaoHoras" rotulo="A duração" />
+        </div>
+        <div class="col-sm-4">
+          <label for="preco" class="form-label">Preço por pessoa (R$) *</label>
+          <input id="preco" type="number" step="0.01" class="form-control" formControlName="preco" [class.is-invalid]="invalido('preco')">
+          <app-campo-erro [control]="form.controls.preco" rotulo="O preço" />
+        </div>
+        <div class="col-sm-4">
+          <label for="capacidade" class="form-label">Vagas por dia *</label>
+          <input id="capacidade" type="number" class="form-control" formControlName="capacidade" [class.is-invalid]="invalido('capacidade')">
+          <app-campo-erro [control]="form.controls.capacidade" rotulo="A capacidade" />
+        </div>
+        <div class="col-12">
+          <label for="imagem" class="form-label">URL da imagem</label>
+          <input id="imagem" class="form-control" formControlName="imagemUrl" placeholder="https://..." [class.is-invalid]="invalido('imagemUrl')">
+          <app-campo-erro [control]="form.controls.imagemUrl" rotulo="A URL" />
+        </div>
+        <div class="col-12">
+          <div class="form-check form-switch">
+            <input id="ativo" class="form-check-input" type="checkbox" formControlName="ativo">
+            <label for="ativo" class="form-check-label">Ativo (aparece no catálogo e aceita reservas)</label>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex gap-2 justify-content-end mt-4">
+        <a routerLink="/admin/passeios" class="btn btn-outline-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-tur" [disabled]="salvando()">
+          <i class="bi bi-save me-1"></i> Salvar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

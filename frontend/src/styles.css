@@ -1,0 +1,93 @@
+:root {
+  --tur-primary: #0b7285;
+  --tur-primary-dark: #095c6b;
+  --tur-accent: #f59f00;
+}
+
+body {
+  background-color: #f4f7f8;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main { flex: 1; }
+
+.bg-primary-tur { background-color: var(--tur-primary); }
+.text-tur { color: var(--tur-primary); }
+
+.btn-tur {
+  background-color: var(--tur-primary);
+  border-color: var(--tur-primary);
+  color: #fff;
+}
+.btn-tur:hover, .btn-tur:focus {
+  background-color: var(--tur-primary-dark);
+  border-color: var(--tur-primary-dark);
+  color: #fff;
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--tur-primary) 0%, #1098ad 60%, #3bc9db 100%);
+  color: #fff;
+  border-radius: 1rem;
+}
+
+.card-passeio {
+  transition: transform .15s ease, box-shadow .15s ease;
+  border: none;
+}
+.card-passeio:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 .75rem 1.5rem rgba(0, 0, 0, .12) !important;
+}
+.card-passeio .card-img-top,
+.img-passeio {
+  object-fit: cover;
+  height: 200px;
+  background-color: #dee2e6;
+}
+.img-detalhe {
+  object-fit: cover;
+  width: 100%;
+  max-height: 340px;
+  border-radius: .75rem;
+  background-color: #dee2e6;
+}
+
+.preco { color: var(--tur-primary); font-weight: 700; }
+
+.passos .passo {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  color: #868e96;
+  font-size: .9rem;
+}
+.passos .passo .num {
+  width: 1.8rem; height: 1.8rem;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #dee2e6; color: #495057; font-weight: 700;
+}
+.passos .passo.ativo { color: var(--tur-primary); font-weight: 600; }
+.passos .passo.ativo .num { background: var(--tur-primary); color: #fff; }
+
+.comprovante {
+  border: 2px dashed var(--tur-primary);
+  border-radius: 1rem;
+  background: #fff;
+}
+.codigo-comprovante {
+  font-family: monospace;
+  font-size: 1.6rem;
+  letter-spacing: .15rem;
+  color: var(--tur-primary);
+}
+
+.table td, .table th { vertical-align: middle; }
+
+@media print {
+  body { background: #fff; }
+  .comprovante { border-color: #000; }
+}

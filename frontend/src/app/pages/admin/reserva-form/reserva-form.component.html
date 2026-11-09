@@ -1,0 +1,56 @@
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-7">
+    <h3 class="mb-3">
+      <i class="bi bi-calendar-check text-tur"></i> {{ id ? 'Editar' : 'Nova' }} reserva
+      @if (codigo()) { <small class="text-muted font-monospace fs-6">{{ codigo() }}</small> }
+    </h3>
+    @if (erro()) { <div class="alert alert-danger">{{ erro() }}</div> }
+
+    <form [formGroup]="form" (ngSubmit)="salvar()" class="card border-0 shadow-sm p-4" novalidate>
+      <div class="row g-3">
+        <div class="col-12">
+          <label for="cliente" class="form-label">Cliente *</label>
+          <select id="cliente" class="form-select" formControlName="clienteId" [class.is-invalid]="invalido('clienteId')">
+            <option [ngValue]="null" disabled>Selecione...</option>
+            @for (c of clientes(); track c.id) {
+              <option [ngValue]="c.id">{{ c.nome }} — {{ c.cpf | formatar: 'cpf' }}</option>
+            }
+          </select>
+          <app-campo-erro [control]="form.controls.clienteId" rotulo="O cliente" />
+        </div>
+        <div class="col-12">
+          <label for="passeio" class="form-label">Passeio *</label>
+          <select id="passeio" class="form-select" formControlName="passeioId" [class.is-invalid]="invalido('passeioId')">
+            <option [ngValue]="null" disabled>Selecione...</option>
+            @for (p of passeios(); track p.id) {
+              <option [ngValue]="p.id">{{ p.nome }} — {{ p.preco | currency: 'BRL' }}</option>
+            }
+          </select>
+          <app-campo-erro [control]="form.controls.passeioId" rotulo="O passeio" />
+        </div>
+        <div class="col-sm-6">
+          <label for="data" class="form-label">Data do passeio *</label>
+          <input id="data" type="date" class="form-control" formControlName="dataPasseio" [min]="hoje" [class.is-invalid]="invalido('dataPasseio')">
+          <app-campo-erro [control]="form.controls.dataPasseio" rotulo="A data" />
+        </div>
+        <div class="col-sm-6">
+          <label for="qtd" class="form-label">Participantes *</label>
+          <input id="qtd" type="number" min="1" max="50" class="form-control" formControlName="quantidadeParticipantes" [class.is-invalid]="invalido('quantidadeParticipantes')">
+          <app-campo-erro [control]="form.controls.quantidadeParticipantes" rotulo="A quantidade" />
+        </div>
+        <div class="col-12">
+          <label for="obs" class="form-label">Observações</label>
+          <textarea id="obs" rows="2" class="form-control" formControlName="observacoes" [class.is-invalid]="invalido('observacoes')"></textarea>
+          <app-campo-erro [control]="form.controls.observacoes" rotulo="As observações" />
+        </div>
+      </div>
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <span class="text-muted">Total: <span class="preco fs-5">{{ valorTotal() | currency: 'BRL' }}</span></span>
+        <div class="d-flex gap-2">
+          <a routerLink="/admin/reservas" class="btn btn-outline-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-tur" [disabled]="salvando()"><i class="bi bi-save me-1"></i> Salvar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

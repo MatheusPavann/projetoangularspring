@@ -1,0 +1,150 @@
+<a routerLink="/" class="btn btn-link px-0 mb-3"><i class="bi bi-arrow-left"></i> Voltar ao catálogo</a>
+
+<div class="passos d-flex flex-wrap gap-3 gap-md-4 mb-4">
+  <div class="passo"><span class="num">1</span> Escolha o passeio</div>
+  <div class="passo ativo"><span class="num">2</span> Data e participantes</div>
+  <div class="passo"><span class="num">3</span> Reserva e comprovante</div>
+</div>
+
+@if (carregando()) {
+  <div class="text-center py-5"><div class="spinner-border text-tur" role="status"></div></div>
+} @else if (!passeio()) {
+  <div class="alert alert-danger">{{ erro() }}</div>
+} @else {
+  @let p = passeio()!;
+  <div class="row g-4">
+    <!-- Detalhes do passeio -->
+    <div class="col-12 col-lg-7">
+      <img [src]="p.imagemUrl || '/sem-imagem.svg'" class="img-detalhe mb-3 shadow-sm" [alt]="p.nome" (error)="imagemPadrao($event)">
+      <span class="text-muted"><i class="bi bi-geo-alt"></i> {{ p.destino }}</span>
+      <h2 class="fw-bold">{{ p.nome }}</h2>
+      <p class="text-secondary">{{ p.descricao }}</p>
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge text-bg-light border"><i class="bi bi-clock"></i> {{ p.duracaoHoras }} horas</span>
+        <span class="badge text-bg-light border"><i class="bi bi-people"></i> Até {{ p.capacidade }} pessoas por dia</span>
+        <span class="badge text-bg-light border"><i class="bi bi-cash"></i> {{ p.preco | currency: 'BRL' }} por pessoa</span>
+      </div>
+      @if (erro()) {
+        <div class="alert alert-warning">{{ erro() }}</div>
+      }
+    </div>
+
+    <!-- Formulário de reserva -->
+    <div class="col-12 col-lg-5">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          <h5 class="mb-3"><i class="bi bi-calendar-event text-tur"></i> Data e participantes</h5>
+
+          <form [formGroup]="reservaForm" novalidate>
+            <div class="mb-3">
+              <label for="data" class="form-label">Data do passeio *</label>
+              <input id="data" type="date" class="form-control" formControlName="dataPasseio" [min]="hoje"
+                     [class.is-invalid]="reservaForm.controls.dataPasseio.invalid && reservaForm.controls.dataPasseio.touched">
+              <app-campo-erro [control]="reservaForm.controls.dataPasseio" rotulo="A data" />
+              @if (disponibilidade(); as d) {
+                <div class="form-text" [class.text-danger]="d.vagasDisponiveis === 0">
+                  <i class="bi bi-info-circle"></i> {{ d.vagasDisponiveis }} de {{ d.capacidade }} vagas disponíveis nesta data
+                </div>
+              }
+            </div>
+
+            <div class="mb-3">
+              <label for="qtd" class="form-label">Participantes *</label>
+              <input id="qtd" type="number" min="1" max="50" class="form-control" formControlName="quantidadeParticipantes"
+                     [class.is-invalid]="reservaForm.controls.quantidadeParticipantes.invalid && reservaForm.controls.quantidadeParticipantes.touched">
+              <app-campo-erro [control]="reservaForm.controls.quantidadeParticipantes" rotulo="A quantidade" />
+            </div>
+
+            <div class="mb-3">
+              <label for="obs" class="form-label">Observações</label>
+              <textarea id="obs" rows="2" class="form-control" formControlName="observacoes"
+                        placeholder="Ex.: restrição alimentar, criança de colo..."
+                        [class.is-invalid]="reservaForm.controls.observacoes.invalid"></textarea>
+              <app-campo-erro [control]="reservaForm.controls.observacoes" rotulo="As observações" />
+            </div>
+          </form>
+
+          <hr>
+          <h5 class="mb-3"><i class="bi bi-person text-tur"></i> Seus dados</h5>
+
+          @if (cliente(); as c) {
+            <div class="alert alert-success d-flex justify-content-between align-items-start">
+              <div>
+                <strong>{{ c.nome }}</strong><br>
+                <small>CPF {{ c.cpf | formatar: 'cpf' }} &middot; {{ c.email }}</small>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="trocarCliente()">Trocar</button>
+            </div>
+          } @else {
+            <form [formGroup]="cpfForm" (ngSubmit)="buscarCliente()" novalidate>
+              <label for="cpf" class="form-label">CPF *</label>
+              <div class="input-group has-validation">
+                <input id="cpf" class="form-control" formControlName="cpf" placeholder="000.000.000-00" maxlength="14"
+                       [class.is-invalid]="cpfForm.controls.cpf.invalid && cpfForm.controls.cpf.touched"
+                       [readonly]="novoCliente()">
+                @if (novoCliente()) {
+                  <button type="button" class="btn btn-outline-secondary" (click)="trocarCliente()">Alterar</button>
+                } @else {
+                  <button type="submit" class="btn btn-outline-primary" [disabled]="buscandoCpf()">
+                    @if (buscandoCpf()) { <span class="spinner-border spinner-border-sm"></span> } @else { Continuar }
+                  </button>
+                }
+                <app-campo-erro [control]="cpfForm.controls.cpf" rotulo="O CPF" />
+              </div>
+            </form>
+
+            @if (novoCliente()) {
+              <div class="alert alert-info small mt-3 mb-2">CPF não cadastrado. Preencha seus dados para continuar.</div>
+              <form [formGroup]="clienteForm" novalidate>
+                <div class="mb-2">
+                  <label for="nome" class="form-label">Nome completo *</label>
+                  <input id="nome" class="form-control" formControlName="nome"
+                         [class.is-invalid]="clienteForm.controls.nome.invalid && clienteForm.controls.nome.touched">
+                  <app-campo-erro [control]="clienteForm.controls.nome" rotulo="O nome" />
+                </div>
+                <div class="mb-2">
+                  <label for="email" class="form-label">E-mail *</label>
+                  <input id="email" type="email" class="form-control" formControlName="email"
+                         [class.is-invalid]="clienteForm.controls.email.invalid && clienteForm.controls.email.touched">
+                  <app-campo-erro [control]="clienteForm.controls.email" rotulo="O e-mail" />
+                </div>
+                <div class="row g-2">
+                  <div class="col-sm-6">
+                    <label for="tel" class="form-label">Telefone *</label>
+                    <input id="tel" class="form-control" formControlName="telefone" placeholder="(00) 00000-0000"
+                           [class.is-invalid]="clienteForm.controls.telefone.invalid && clienteForm.controls.telefone.touched">
+                    <app-campo-erro [control]="clienteForm.controls.telefone" rotulo="O telefone" />
+                  </div>
+                  <div class="col-sm-6">
+                    <label for="nasc" class="form-label">Nascimento *</label>
+                    <input id="nasc" type="date" class="form-control" formControlName="dataNascimento" [max]="hoje"
+                           [class.is-invalid]="clienteForm.controls.dataNascimento.invalid && clienteForm.controls.dataNascimento.touched">
+                    <app-campo-erro [control]="clienteForm.controls.dataNascimento" rotulo="A data de nascimento" />
+                  </div>
+                </div>
+              </form>
+            }
+          }
+
+          <hr>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted">Total ({{ reservaForm.controls.quantidadeParticipantes.value || 0 }}x {{ p.preco | currency: 'BRL' }})</span>
+            <span class="preco fs-4">{{ valorTotal() | currency: 'BRL' }}</span>
+          </div>
+
+          @if (erroEnvio()) {
+            <div class="alert alert-danger small">{{ erroEnvio() }}</div>
+          }
+
+          <button type="button" class="btn btn-tur w-100 btn-lg" (click)="confirmar()" [disabled]="enviando() || !p.ativo">
+            @if (enviando()) {
+              <span class="spinner-border spinner-border-sm me-2"></span> Reservando...
+            } @else {
+              <i class="bi bi-check2-circle me-1"></i> Confirmar reserva
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
